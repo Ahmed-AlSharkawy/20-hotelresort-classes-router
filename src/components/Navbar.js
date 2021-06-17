@@ -26,10 +26,14 @@ export default class Navbar extends Component {
           </div>
           <ul className={`nav-links ${this.state.isListOpen && 'show-nav'}`}>
             <li>
-              <Link to='/'>Home</Link>
+              <Link to='/' onClick={this.toggleList}>
+                Home
+              </Link>
             </li>
             <li>
-              <Link to='/rooms'>Rooms</Link>
+              <Link to='/rooms' onClick={this.toggleList}>
+                Rooms
+              </Link>
             </li>
           </ul>
         </div>
