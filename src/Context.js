@@ -13,20 +13,24 @@ class RoomProvider extends Component {
 
   componentDidMount() {
     const rooms = this.formatData(items)
-    console.log(rooms)
-    this.setState({
-      rooms,
-      sortedRooms: rooms,
-      featuredRooms: rooms.filter((room) => room.featured === true),
-    })
+    this.setState(
+      {
+        rooms,
+        sortedRooms: rooms,
+        featuredRooms: rooms.filter((room) => room.featured === true),
+        isLoading: false,
+      },
+      () => {
+        console.log(this.state.featuredRooms)
+      }
+    )
   }
 
   formatData(itemsList) {
     return itemsList.map((item) => {
       const id = item.sys.id
-      const images = item.fields.images.filter((image) => image.fields.file.url)
-
-      return { id, images, ...item.fields }
+      const images = item.fields.images.map((image) => image.fields.file.url)
+      return { ...item.fields, id, images }
     })
   }
 

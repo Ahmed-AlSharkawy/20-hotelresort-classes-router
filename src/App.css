@@ -76,9 +76,7 @@ h6 {
 }
 .loading img {
   width: 40%;
-  height: 40%;
   max-width: 350px;
-  max-height: 350px;
 }
 .error {
   text-align: center;
@@ -215,6 +213,7 @@ h6 {
   }
 }
 /* End of Banner */
+
 /* Title */
 .section-title {
   text-align: center;
