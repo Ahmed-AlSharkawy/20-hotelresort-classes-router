@@ -15,7 +15,7 @@ export default class Services extends Component {
           {this.state.services.map((service) => {
             const { id, icon1, icon2, title, info } = service
             return (
-              <article key={id} class='service'>
+              <article key={id} className='service'>
                 <span>
                   {icon1} {icon2}
                 </span>
