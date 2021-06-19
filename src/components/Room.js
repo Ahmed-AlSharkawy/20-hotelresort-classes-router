@@ -1,4 +1,5 @@
 import React from 'react'
+import propTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
 export default function Room({ room }) {
@@ -15,6 +16,15 @@ export default function Room({ room }) {
           Features
         </Link>
       </div>
+      <p className='room-info'>{name}</p>
     </article>
   )
+}
+Room.propTypes = {
+  room: propTypes.shape({
+    name: propTypes.string.isRequired,
+    slug: propTypes.string.isRequired,
+    images: propTypes.arrayOf(propTypes.string).isRequired,
+    price: propTypes.number.isRequired,
+  }),
 }
