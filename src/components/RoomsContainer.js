@@ -1,19 +1,21 @@
 import React from 'react'
-// import { RoomConsumer } from '../Context'
 import { consumerHolder } from '../Context'
 import RoomsFilter from './RoomsFilter'
+import RoomsOrder from './RoomsOrder'
 import RoomsList from './RoomsList'
 import Loading from './Loading'
 
 function RoomsContainer({ context }) {
-  const { rooms, sortedRooms, isLoading } = context
+  const { rooms, sortedRooms, orderedRooms, isOrdered, isLoading } = context
 
   if (isLoading) return <Loading />
 
   return (
     <div>
       <RoomsFilter rooms={rooms} />
-      <RoomsList rooms={sortedRooms} />
+      <RoomsOrder />
+
+      <RoomsList rooms={isOrdered ? orderedRooms : sortedRooms} />
     </div>
   )
 

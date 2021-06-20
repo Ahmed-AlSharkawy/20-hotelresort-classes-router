@@ -24,6 +24,7 @@ export default function RoomsFilter({ rooms }) {
 
   const {
     handleChange,
+    sortRooms,
     type,
     capacity,
     price,

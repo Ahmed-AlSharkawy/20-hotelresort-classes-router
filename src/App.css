@@ -325,19 +325,37 @@ h6 {
 }
 .price-top {
   position: absolute;
-  top: 0;
-  left: 0;
   background: rgba(0, 0, 0, 0.8);
   color: var(--mainWhite);
   padding: 0.3rem 0.6rem 0.5rem;
-  border-bottom-right-radius: 1rem;
   font-size: 0.5rem;
   text-align: center;
   transition: var(--mainTransition);
 }
+.price-top-left {
+  top: 0;
+  left: 0;
+  border-bottom-right-radius: 1rem;
+}
+.price-top-right {
+  top: 0;
+  right: 0;
+  border-bottom-left-radius: 1rem;
+}
+.price-bottom-left {
+  bottom: 0;
+  left: 0;
+  border-top-right-radius: 1rem;
+}
+.price-bottom-right {
+  bottom: 0;
+  right: 0;
+  border-top-left-radius: 1rem;
+}
+
 .price-top h6 {
   margin-bottom: 0;
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   font-weight: 300;
   letter-spacing: var(--mainSpacing);
 }
@@ -446,7 +464,8 @@ h6 {
 /* end of single room*/
 /* roomlist */
 .roomslist {
-  padding: 5rem 0;
+  padding: 0;
+  margin: 3rem auto;
 }
 .roomslist-center {
   width: 80vw;
@@ -471,14 +490,22 @@ h6 {
 /* end of roomlist */
 /*  rooms fitler*/
 .filter-container {
-  padding: 5rem 0;
+  padding: 0;
+  margin-top: 3rem;
+}
+.filter-container .section-title {
+  margin-bottom: 1.5rem;
+}
+
+.filter-container .section-title h4 {
+  font-size: 1.1rem;
 }
 .filter-form {
   width: 60vw;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(202px, 1fr));
-  grid-row-gap: 2rem;
+  grid-row-gap: 1rem;
   grid-column-gap: 40px;
 }
 .form-group {
@@ -488,6 +515,7 @@ h6 {
   display: block;
   letter-spacing: var(--mainSpacing);
   margin-bottom: 0.5rem;
+  font-size: 0.8rem;
 }
 .form-control {
   width: 100%;
@@ -513,11 +541,104 @@ h6 {
   .filter-form {
     width: 70vw;
   }
+  .filter-container .section-title h4 {
+    font-size: 1.3rem;
+  }
+  .form-group label {
+    font-size: 0.9rem;
+  }
 }
 @media screen and (min-width: 992px) {
   .filter-form {
     width: 95vw;
     max-width: 1170px;
+  }
+  .filter-container .section-title h4 {
+    font-size: 1.5rem;
+  }
+  .form-group label {
+    font-size: 1rem;
+  }
+}
+/* end of rooms fitler*/
+
+/*  rooms order*/
+.order-container {
+  padding: 0;
+  margin-top: 3rem;
+}
+.order-container .section-title {
+  margin-bottom: 1.5rem;
+}
+.order-container .section-title h4 {
+  font-size: 1.1rem;
+}
+.order-form {
+  width: 60vw;
+  max-width: 90%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-row-gap: 1rem;
+  grid-column-gap: 40px;
+}
+.order-form-group {
+  text-transform: capitalize;
+  /* display: inline-block; */
+}
+.order-form-group label {
+  letter-spacing: var(--mainSpacing);
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+}
+.order-form-group input {
+  height: 0.6rem;
+}
+.order-form-des label {
+  font-size: 0.6rem;
+}
+.order-form-des input {
+  height: 0.4rem;
+}
+
+@media screen and (min-width: 776px) {
+  .order-form {
+    width: 70vw;
+  }
+  .order-container .section-title h4 {
+    font-size: 1.3rem;
+  }
+  .order-form-group label {
+    font-size: 0.9rem;
+  }
+  .order-form-group input {
+    height: 0.7rem;
+  }
+  .order-form-des label {
+    font-size: 0.7rem;
+  }
+  .order-form-des input {
+    height: 0.5rem;
+  }
+}
+@media screen and (min-width: 992px) {
+  .order-form {
+    width: 95vw;
+  }
+  .order-container .section-title h4 {
+    font-size: 1.5rem;
+  }
+  .order-form-group label {
+    font-size: 1rem;
+  }
+  .order-form-group input {
+    height: 0.8rem;
+  }
+  .order-form-des label {
+    font-size: 0.8rem;
+  }
+  .order-form-des input {
+    height: 0.6rem;
   }
 }
 /* end of rooms fitler*/

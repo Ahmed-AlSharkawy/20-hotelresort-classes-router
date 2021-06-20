@@ -223,31 +223,19 @@ class RoomProvider extends Component {
     if (sizeOrder) {
       this.orderBySize(rooms)
       return rooms.sort((first, second) =>
-        (this.compareTwoFilters(
-          first,
-          second,
-          priceOrder,
-          typeOrder,
-          'price',
-          'type'
-        ) &&
+        (priceOrder &&
+          typeOrder &&
+          first.price === second.price &&
+          first.type === second.type &&
           first.size === second.size) ||
-        this.compareTwoFilters(
-          first,
-          second,
-          priceOrder,
-          !typeOrder,
-          'price',
-          'size'
-        ) ||
-        this.compareTwoFilters(
-          first,
-          second,
-          !priceOrder,
-          typeOrder,
-          'type',
-          'size'
-        ) ||
+        (priceOrder &&
+          !typeOrder &&
+          first.price === second.price &&
+          first.size === second.size) ||
+        (!priceOrder &&
+          typeOrder &&
+          first.type === second.type &&
+          first.size === second.size) ||
         (!priceOrder && !typeOrder && first.size === second.size)
           ? this.compareNumbers(
               first.capacity,
@@ -259,7 +247,9 @@ class RoomProvider extends Component {
     } else if (typeOrder) {
       this.orderByType(rooms)
       return rooms.sort((first, second) =>
-        this.compareOneFilter(first, second, priceOrder, 'price', 'type') ||
+        (priceOrder &&
+          first.price === second.price &&
+          first.type === second.type) ||
         (!priceOrder && first.type === second.type)
           ? this.compareNumbers(
               first.capacity,
@@ -287,7 +277,9 @@ class RoomProvider extends Component {
     if (typeOrder) {
       this.orderByType(rooms)
       return rooms.sort((first, second) =>
-        this.compareOneFilter(first, second, priceOrder, 'price', 'type') ||
+        (priceOrder &&
+          first.price === second.price &&
+          first.type === second.type) ||
         (!priceOrder && first.type === second.type)
           ? this.compareNumbers(first.size, second.size, sizeOrderDes)
           : null
@@ -323,7 +315,7 @@ class RoomProvider extends Component {
   }
 
   compareStrings(first, second, check) {
-    if (check) return second.localeCompar(first)
+    if (check) return second.localeCompare(first)
     return first.localeCompare(second)
   }
 
@@ -341,21 +333,6 @@ class RoomProvider extends Component {
   orderByNumber(rooms, check, prop) {
     if (check) return rooms.sort((first, second) => second[prop] - first[prop])
     else return rooms.sort((first, second) => first[prop] - second[prop])
-  }
-
-  compareOneFilter(first, second, check, fProp, sProp) {
-    return (
-      check && first[fProp] === second[fProp] && first[sProp] === second[sProp]
-    )
-  }
-
-  compareTwoFilters(first, second, fCheck, sCheck, fProp, sProp) {
-    return (
-      fCheck &&
-      sCheck &&
-      first[fProp] === second[fProp] &&
-      first[sProp] === second[sProp]
-    )
   }
 
   render() {
