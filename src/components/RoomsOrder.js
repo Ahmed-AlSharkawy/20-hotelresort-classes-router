@@ -36,9 +36,6 @@ export default function RoomsOrder() {
     sizeOrderDes,
     capacityOrder,
     capacityOrderDes,
-
-    breakfast,
-    pets,
   } = context
 
   // name price type size capacity

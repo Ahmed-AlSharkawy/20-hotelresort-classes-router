@@ -151,7 +151,6 @@ class RoomProvider extends Component {
   }
 
   handleOrderChange = (event) => {
-    console.log(event.target.name, event.target.value)
     this.setState(
       {
         [event.target.name]: event.target.checked,

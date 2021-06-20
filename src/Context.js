@@ -1,4 +1,4 @@
-import React, { Children, Component } from 'react'
+import React, { Component } from 'react'
 import items from './data'
 
 const RoomContext = React.createContext()
@@ -10,6 +10,7 @@ class RoomProvider extends Component {
     orderedRooms: [],
     featuredRooms: [],
     isLoading: true,
+    isFiltered: false,
     type: 'all',
     capacity: 1,
     price: 0,
@@ -56,13 +57,17 @@ class RoomProvider extends Component {
   resetPriceAndSize() {
     const rooms = this.state.rooms
     const maxPrice = Math.max(...rooms.map((room) => room.price))
+    const minPrice = Math.min(...rooms.map((room) => room.price))
 
     const maxSize = Math.max(...rooms.map((room) => room.size))
+    const minSize = Math.min(...rooms.map((room) => room.size))
 
     this.setState({
       price: maxPrice,
       maxPrice,
+      minPrice,
       maxSize,
+      minSize,
     })
   }
 
@@ -79,6 +84,8 @@ class RoomProvider extends Component {
   }
 
   handleChange = (event) => {
+    if (this.state.isOrdered) this.resetOrders()
+
     const target = event.target
     let value = target.type === 'checkbox' ? target.checked : target.value
     const name = target.name
@@ -95,8 +102,18 @@ class RoomProvider extends Component {
     this.setState(
       {
         [name]: value,
+        isFiltered: true,
       },
       this.filterRooms
+    )
+  }
+
+  handleOrderChange = (event) => {
+    this.setState(
+      {
+        [event.target.name]: event.target.checked,
+      },
+      this.orderRooms
     )
   }
 
@@ -137,48 +154,17 @@ class RoomProvider extends Component {
     })
   }
 
-  resetFilters = () => {
-    this.setState({
-      sortedRooms: this.state.rooms,
-      type: 'all',
-      capacity: 1,
-      minPrice: 0,
-      minSize: 0,
-      breakfast: false,
-      pets: false,
-    })
-    this.resetPriceAndSize()
-  }
-
-  handleOrderChange = (event) => {
-    console.log(event.target.name, event.target.value)
-    this.setState(
-      {
-        [event.target.name]: event.target.checked,
-      },
-      this.orderRooms
-    )
-  }
-
   orderRooms() {
     let tempRooms = [...this.state.sortedRooms]
 
     if (tempRooms.length > 0) {
       let {
-        type,
-        size,
-        capacity,
-        name,
         nameOrder,
         nameOrderDes,
         priceOrder,
-        priceOrderDes,
         typeOrder,
-        typeOrderDes,
         sizeOrder,
-        sizeOrderDes,
         capacityOrder,
-        capacityOrderDes,
       } = this.state
 
       /*
@@ -216,6 +202,35 @@ class RoomProvider extends Component {
         isOrdered: true,
       })
     }
+  }
+
+  resetFilters = () => {
+    this.setState({
+      sortedRooms: this.state.rooms,
+      type: 'all',
+      capacity: 1,
+      minPrice: 0,
+      minSize: 0,
+      breakfast: false,
+      pets: false,
+    })
+    this.resetPriceAndSize()
+  }
+
+  resetOrders = () => {
+    this.setState({
+      isOrdered: false,
+      nameOrder: false,
+      nameOrderDes: false,
+      priceOrder: false,
+      priceOrderDes: false,
+      typeOrder: false,
+      typeOrderDes: false,
+      sizeOrder: false,
+      sizeOrderDes: false,
+      capacityOrder: false,
+      capacityOrderDes: false,
+    })
   }
 
   orderByCapacity(rooms) {
@@ -365,8 +380,9 @@ class RoomProvider extends Component {
           ...this.state,
           getRoom: this.getRoom,
           handleChange: this.handleChange,
-          resetFilters: this.resetFilters,
           handleOrderChange: this.handleOrderChange,
+          resetFilters: this.resetFilters,
+          resetOrders: this.resetOrders,
         }}
       >
         {this.props.children}
