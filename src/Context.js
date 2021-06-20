@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import items from './data'
+import Client from './Contentful'
+// import items from './data'
 
 const RoomContext = React.createContext()
 
@@ -34,24 +35,34 @@ class RoomProvider extends Component {
   }
 
   componentDidMount() {
-    const rooms = this.formatData(items)
+    this.getData()
+  }
 
-    const featuredRooms = rooms.filter((room) => room.featured === true)
+  getData = async () => {
+    try {
+      let response = await Client.getEntries({
+        content_type: 'beachResortRooms',
+        order: 'sys.createdAt',
+      })
 
-    this.setState(
-      {
-        rooms,
-        sortedRooms: rooms,
-        featuredRooms,
-        isLoading: false,
-        // price: maxPrice,
-        // maxPrice,
-        // maxSize,
-      },
-      () => {
-        this.resetPriceAndSize()
-      }
-    )
+      const rooms = this.formatData(response.items)
+
+      const featuredRooms = rooms.filter((room) => room.featured === true)
+
+      this.setState(
+        {
+          rooms,
+          sortedRooms: rooms,
+          featuredRooms,
+          isLoading: false,
+        },
+        () => {
+          this.resetPriceAndSize()
+        }
+      )
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   resetPriceAndSize() {
