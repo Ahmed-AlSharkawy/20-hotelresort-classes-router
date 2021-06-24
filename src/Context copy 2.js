@@ -1,5 +1,6 @@
-import React, { Children, Component } from 'react'
-import items from './data'
+import React, { Component } from 'react'
+import Client from './Contentful'
+// import items from './data'
 
 const RoomContext = React.createContext()
 
@@ -10,6 +11,7 @@ class RoomProvider extends Component {
     orderedRooms: [],
     featuredRooms: [],
     isLoading: true,
+    isFiltered: false,
     type: 'all',
     capacity: 1,
     price: 0,
@@ -33,36 +35,50 @@ class RoomProvider extends Component {
   }
 
   componentDidMount() {
-    const rooms = this.formatData(items)
+    this.getData()
+  }
 
-    const featuredRooms = rooms.filter((room) => room.featured === true)
+  getData = async () => {
+    try {
+      let response = await Client.getEntries({
+        content_type: 'beachResortRooms',
+        order: 'sys.createdAt',
+      })
 
-    this.setState(
-      {
-        rooms,
-        sortedRooms: rooms,
-        featuredRooms,
-        isLoading: false,
-        // price: maxPrice,
-        // maxPrice,
-        // maxSize,
-      },
-      () => {
-        this.resetPriceAndSize()
-      }
-    )
+      const rooms = this.formatData(response.items)
+
+      const featuredRooms = rooms.filter((room) => room.featured === true)
+
+      this.setState(
+        {
+          rooms,
+          sortedRooms: rooms,
+          featuredRooms,
+          isLoading: false,
+        },
+        () => {
+          this.resetPriceAndSize()
+        }
+      )
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   resetPriceAndSize() {
     const rooms = this.state.rooms
     const maxPrice = Math.max(...rooms.map((room) => room.price))
+    const minPrice = Math.min(...rooms.map((room) => room.price))
 
     const maxSize = Math.max(...rooms.map((room) => room.size))
+    const minSize = Math.min(...rooms.map((room) => room.size))
 
     this.setState({
       price: maxPrice,
       maxPrice,
+      minPrice,
       maxSize,
+      minSize,
     })
   }
 
@@ -79,6 +95,8 @@ class RoomProvider extends Component {
   }
 
   handleChange = (event) => {
+    if (this.state.isOrdered) this.resetOrders()
+
     const target = event.target
     let value = target.type === 'checkbox' ? target.checked : target.value
     const name = target.name
@@ -95,8 +113,18 @@ class RoomProvider extends Component {
     this.setState(
       {
         [name]: value,
+        isFiltered: true,
       },
       this.filterRooms
+    )
+  }
+
+  handleOrderChange = (event) => {
+    this.setState(
+      {
+        [event.target.name]: event.target.checked,
+      },
+      this.orderRooms
     )
   }
 
@@ -137,47 +165,17 @@ class RoomProvider extends Component {
     })
   }
 
-  resetFilters = () => {
-    this.setState({
-      sortedRooms: this.state.rooms,
-      type: 'all',
-      capacity: 1,
-      minPrice: 0,
-      minSize: 0,
-      breakfast: false,
-      pets: false,
-    })
-    this.resetPriceAndSize()
-  }
-
-  handleOrderChange = (event) => {
-    this.setState(
-      {
-        [event.target.name]: event.target.checked,
-      },
-      this.orderRooms
-    )
-  }
-
   orderRooms() {
     let tempRooms = [...this.state.sortedRooms]
 
     if (tempRooms.length > 0) {
       let {
-        type,
-        size,
-        capacity,
-        name,
         nameOrder,
         nameOrderDes,
         priceOrder,
-        priceOrderDes,
         typeOrder,
-        typeOrderDes,
         sizeOrder,
-        sizeOrderDes,
         capacityOrder,
-        capacityOrderDes,
       } = this.state
 
       /*
@@ -217,34 +215,67 @@ class RoomProvider extends Component {
     }
   }
 
+  resetFilters = () => {
+    this.setState({
+      sortedRooms: this.state.rooms,
+      type: 'all',
+      capacity: 1,
+      minPrice: 0,
+      minSize: 0,
+      breakfast: false,
+      pets: false,
+    })
+    this.resetPriceAndSize()
+  }
+
+  resetOrders = () => {
+    this.setState({
+      isOrdered: false,
+      nameOrder: false,
+      nameOrderDes: false,
+      priceOrder: false,
+      priceOrderDes: false,
+      typeOrder: false,
+      typeOrderDes: false,
+      sizeOrder: false,
+      sizeOrderDes: false,
+      capacityOrder: false,
+      capacityOrderDes: false,
+    })
+  }
+
   orderByCapacity(rooms) {
     const { priceOrder, typeOrder, sizeOrder, capacityOrderDes } = this.state
+    let state = false
+
     if (sizeOrder) {
       this.orderBySize(rooms)
       return rooms.sort((first, second) =>
-
-      (
-        /* (!priceOrder && !typeOrder) || 
-        (!priceOrder && first.type === second.type ) || 
-        (!typeOrder && first.price === second.price) ||
-        ( first.price === second.price && first.type === second.type)
-         && first.size === second.size */
-
-        (
-          priceOrder &&
-            typeOrder &&
-            first.price === second.price &&
-            first.type === second.type &&
-            first.size === second.size
+        (this.compareTwoFilters(
+          first,
+          second,
+          priceOrder,
+          typeOrder,
+          'price',
+          'type'
+        ) &&
+          first.size === second.size) ||
+        this.compareTwoFilters(
+          first,
+          second,
+          priceOrder,
+          !typeOrder,
+          'price',
+          'size'
         ) ||
-        (priceOrder &&
-          !typeOrder &&
-          first.price === second.price &&
-          first.size === second.size) ||
-        (!priceOrder &&
-          typeOrder &&
-          first.type === second.type &&
-          first.size === second.size) ||
+        this.compareTwoFilters(
+          first,
+          second,
+          !priceOrder,
+          typeOrder,
+          'type',
+          'size'
+        ) ||
         (!priceOrder && !typeOrder && first.size === second.size)
           ? this.compareNumbers(
               first.capacity,
@@ -256,9 +287,7 @@ class RoomProvider extends Component {
     } else if (typeOrder) {
       this.orderByType(rooms)
       return rooms.sort((first, second) =>
-        (priceOrder &&
-          first.price === second.price &&
-          first.type === second.type) ||
+        this.compareOneFilter(first, second, priceOrder, 'price', 'type') ||
         (!priceOrder && first.type === second.type)
           ? this.compareNumbers(
               first.capacity,
@@ -286,9 +315,7 @@ class RoomProvider extends Component {
     if (typeOrder) {
       this.orderByType(rooms)
       return rooms.sort((first, second) =>
-        (priceOrder &&
-          first.price === second.price &&
-          first.type === second.type) ||
+        this.compareOneFilter(first, second, priceOrder, 'price', 'type') ||
         (!priceOrder && first.type === second.type)
           ? this.compareNumbers(first.size, second.size, sizeOrderDes)
           : null
@@ -324,7 +351,7 @@ class RoomProvider extends Component {
   }
 
   compareStrings(first, second, check) {
-    if (check) return second.localeCompare(first)
+    if (check) return second.localeCompar(first)
     return first.localeCompare(second)
   }
 
@@ -344,6 +371,21 @@ class RoomProvider extends Component {
     else return rooms.sort((first, second) => first[prop] - second[prop])
   }
 
+  compareOneFilter(first, second, check, fProp, sProp) {
+    return (
+      check && first[fProp] === second[fProp] && first[sProp] === second[sProp]
+    )
+  }
+
+  compareTwoFilters(first, second, fCheck, sCheck, fProp, sProp) {
+    return (
+      fCheck &&
+      sCheck &&
+      first[fProp] === second[fProp] &&
+      first[sProp] === second[sProp]
+    )
+  }
+
   render() {
     return (
       <RoomContext.Provider
@@ -351,8 +393,9 @@ class RoomProvider extends Component {
           ...this.state,
           getRoom: this.getRoom,
           handleChange: this.handleChange,
-          resetFilters: this.resetFilters,
           handleOrderChange: this.handleOrderChange,
+          resetFilters: this.resetFilters,
+          resetOrders: this.resetOrders,
         }}
       >
         {this.props.children}
